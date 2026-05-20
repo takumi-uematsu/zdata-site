@@ -35,7 +35,7 @@ export default function CTA() {
         <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
           <Reveal stagger>
             <RevealItem>
-              <p className="font-syne italic font-bold leading-[0.92] tracking-[-0.025em] text-white text-[clamp(3rem,6vw+1rem,5.5rem)]">
+              <p className="font-syne italic font-bold leading-[0.92] tracking-[-0.025em] text-white text-[clamp(3rem,calc(6vw_+_1rem),5.5rem)]">
                 Take the
                 <br />
                 <span className="text-sunsetPink">record home.</span>

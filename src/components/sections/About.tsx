@@ -51,7 +51,7 @@ export default function About() {
           className="mt-12 grid items-end gap-8 lg:grid-cols-[1fr_1fr] lg:gap-16"
         >
           <RevealItem>
-            <p className="font-syne italic font-bold leading-[0.92] tracking-[-0.025em] text-white text-[clamp(2.25rem,4.8vw+0.6rem,3.8rem)]">
+            <p className="font-syne italic font-bold leading-[0.92] tracking-[-0.025em] text-white text-[clamp(2.25rem,calc(4.8vw_+_0.6rem),3.8rem)]">
               <span className="text-sunsetPink">Owned data,</span>
               <br />
               not borrowed.
@@ -145,7 +145,7 @@ export default function About() {
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-sunsetPink">
               Why valuable ／ なぜ 0PD が強いか
             </p>
-            <h3 className="mt-5 font-jp font-bold leading-tight text-white text-[clamp(1.4rem,2.6vw+0.4rem,2rem)] [word-break:keep-all]">
+            <h3 className="mt-5 font-jp font-bold leading-tight text-white text-[clamp(1.4rem,calc(2.6vw_+_0.4rem),2rem)] [word-break:keep-all]">
               <span className="text-sunsetPink">Cookie の終焉</span> ×{" "}
               <span className="text-windowBlue">生成AIの実用化</span>
               。

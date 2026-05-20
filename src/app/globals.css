@@ -38,6 +38,11 @@ html,
 body {
   background-color: var(--color-deep-night);
   color: var(--color-text-primary);
+  /* Explicit Noto Sans JP fallback chain — prevents iOS/Windows from defaulting
+     to Mincho/serif before Google Font finishes loading (display: swap). */
+  font-family: var(--font-dm-sans), var(--font-noto-jp),
+    "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic",
+    YuGothic, Meiryo, "Noto Sans CJK JP", "Noto Sans JP", system-ui, sans-serif;
 }
 
 :focus-visible {

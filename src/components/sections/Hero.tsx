@@ -195,7 +195,7 @@ export default function Hero() {
               transition={{ duration: 0.9, delay: 1.8, ease: EASE }}
               className="flex flex-col items-center gap-2.5"
             >
-              <span className="font-syne italic font-bold tracking-tight text-white text-[clamp(1.6rem,2.5vw+0.5rem,2.5rem)] leading-none">
+              <span className="font-syne italic font-bold tracking-tight text-white text-[clamp(1.6rem,calc(2.5vw_+_0.5rem),2.5rem)] leading-none">
                 Z-Data
               </span>
               <div className="flex items-center gap-3">
@@ -268,10 +268,10 @@ export default function Hero() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-windowLight/85">
                   Track 01 ／ The Pulse
                 </p>
-                <p className="font-jp font-bold leading-[1.22] text-white text-[clamp(1.4rem,2.4vw+0.4rem,2rem)] [word-break:keep-all]">
-                  ビジネスの脈動は、
-                  <span className="text-sunsetPink">顧客の声</span>
-                  から始まる。
+                <p className="font-jp font-bold leading-[1.3] text-balance text-white text-[clamp(1.5rem,calc(3vw_+_0.6rem),2.25rem)] [word-break:keep-all]">
+                  <span className="inline-block whitespace-nowrap">ビジネスの脈動は、</span>
+                  {" "}
+                  <span className="inline-block whitespace-nowrap"><span className="text-sunsetPink">顧客の声</span>から始まる。</span>
                 </p>
               </motion.div>
 
@@ -283,10 +283,12 @@ export default function Hero() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-windowLight/85">
                   Track 02 ／ The Method
                 </p>
-                <p className="font-jp font-bold leading-tight text-white text-[clamp(1.3rem,2.4vw+0.3rem,1.9rem)] [word-break:keep-all]">
-                  ノイズではなく、<span className="text-windowBlue">波形</span>を。
+                <p className="font-jp font-bold leading-[1.3] text-balance text-white text-[clamp(1.4rem,calc(3vw_+_0.5rem),2.1rem)] [word-break:keep-all]">
+                  <span className="inline-block whitespace-nowrap">ノイズではなく、</span>
+                  {" "}
+                  <span className="inline-block whitespace-nowrap"><span className="text-windowBlue">波形</span>を。</span>
                 </p>
-                <div className="mt-2 grid w-full max-w-2xl grid-cols-3 gap-3 sm:gap-6 font-syne italic font-bold text-[clamp(1.1rem,2vw+0.2rem,1.6rem)]">
+                <div className="mt-2 grid w-full max-w-2xl grid-cols-3 gap-3 sm:gap-6 font-syne italic font-bold text-[clamp(1.1rem,calc(2vw_+_0.2rem),1.6rem)]">
                   <span className="text-windowBlue">Voice</span>
                   <span className="text-windowLight">Rhythm</span>
                   <span className="text-sunsetPink">Asset</span>
@@ -301,10 +303,10 @@ export default function Hero() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-windowLight/85">
                   Track 03 ／ Get the Pressing
                 </p>
-                <p className="font-jp font-bold leading-tight text-white text-[clamp(1.3rem,2.4vw+0.3rem,1.9rem)] [word-break:keep-all]">
-                  Z-Data を、まず
-                  <span className="text-sunsetPink">資料</span>
-                  で知る。
+                <p className="font-jp font-bold leading-[1.3] text-balance text-white text-[clamp(1.4rem,calc(3vw_+_0.5rem),2.1rem)] [word-break:keep-all]">
+                  <span className="inline-block whitespace-nowrap">Z-Data を、まず</span>
+                  {" "}
+                  <span className="inline-block whitespace-nowrap"><span className="text-sunsetPink">資料</span>で知る。</span>
                 </p>
                 <div className="mt-3 flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
                   <a

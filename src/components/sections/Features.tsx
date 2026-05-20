@@ -79,7 +79,7 @@ export default function Features() {
           className="mt-12 grid items-end gap-8 lg:grid-cols-[1fr_1fr] lg:gap-16"
         >
           <RevealItem>
-            <p className="font-syne italic font-bold leading-[0.92] tracking-[-0.02em] text-white text-[clamp(2.5rem,5.5vw+0.8rem,4.5rem)]">
+            <p className="font-syne italic font-bold leading-[0.92] tracking-[-0.02em] text-white text-[clamp(2.5rem,calc(5.5vw_+_0.8rem),4.5rem)]">
               5 modules.
               <br />
               <span className="text-windowBlue">One pulse.</span>

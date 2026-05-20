@@ -123,7 +123,7 @@ export default function Solution() {
                   </div>
                   <h3
                     className={cn(
-                      "mt-6 font-syne italic font-bold leading-[0.9] tracking-tight text-[clamp(2.2rem,3vw+0.8rem,3rem)]",
+                      "mt-6 font-syne italic font-bold leading-[0.9] tracking-tight text-[clamp(2.2rem,calc(3vw_+_0.8rem),3rem)]",
                       toneColor[p.tone],
                     )}
                   >
