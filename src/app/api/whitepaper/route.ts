@@ -52,7 +52,10 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    await recordWhitepaperSubmission(parsed.data);
+    await recordWhitepaperSubmission(parsed.data, {
+      userAgent: request.headers.get("user-agent"),
+      referer: request.headers.get("referer"),
+    });
 
     return reply(
       {

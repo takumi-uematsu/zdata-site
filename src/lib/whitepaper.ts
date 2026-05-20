@@ -17,11 +17,18 @@
 
 import type { WhitepaperPayload } from "@/types/whitepaper";
 import { REASON_LABEL } from "@/types/whitepaper";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 const ENABLE_EMAIL = process.env.ENABLE_EMAIL_SENDING === "true";
 
 interface SubmitResult {
   notified: boolean;
+  persisted: boolean;
+}
+
+export interface SubmissionContext {
+  userAgent?: string | null;
+  referer?: string | null;
 }
 
 const ts = () =>
@@ -38,6 +45,7 @@ const ts = () =>
 
 export async function recordWhitepaperSubmission(
   payload: WhitepaperPayload,
+  ctx: SubmissionContext = {},
 ): Promise<SubmitResult> {
   const reasonLabel = payload.reason
     ? REASON_LABEL[payload.reason]
@@ -62,9 +70,42 @@ export async function recordWhitepaperSubmission(
     ].join("\n"),
   );
 
+  // === Persist to Supabase if configured (gated by ENABLE_SUPABASE_PERSIST) ===
+  let persisted = false;
+  const supabase = getSupabaseAdmin();
+  if (supabase) {
+    try {
+      const { error } = await supabase.from("whitepaper_leads").insert({
+        company: payload.company,
+        name: payload.name,
+        email: payload.email,
+        position: payload.position ?? null,
+        phone: payload.phone ?? null,
+        reason: payload.reason ?? null,
+        message: payload.message ?? null,
+        consent: payload.consent,
+        source: "whitepaper",
+        user_agent: ctx.userAgent ?? null,
+        referer: ctx.referer ?? null,
+      });
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error("[whitepaper] Supabase insert error:", error.message);
+      } else {
+        persisted = true;
+        // eslint-disable-next-line no-console
+        console.log("[whitepaper] Persisted to Supabase ✓");
+      }
+    } catch (e) {
+      // Never let DB failure block the user response.
+      // eslint-disable-next-line no-console
+      console.error("[whitepaper] Supabase insert threw:", e);
+    }
+  }
+
   if (!ENABLE_EMAIL) {
-    // Development mode (default). Do NOT call any external service.
-    return { notified: false };
+    // Development mode (default). Do NOT call any external email service.
+    return { notified: false, persisted };
   }
 
   // Production path is intentionally not implemented in this build.
@@ -78,5 +119,5 @@ export async function recordWhitepaperSubmission(
   console.warn(
     "[whitepaper] ENABLE_EMAIL_SENDING=true is set but no transport is wired in this build.",
   );
-  return { notified: false };
+  return { notified: false, persisted };
 }
