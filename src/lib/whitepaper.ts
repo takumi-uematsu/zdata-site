@@ -15,11 +15,15 @@
  * ENABLE_EMAIL_SENDING=true — by default it is OFF, even if a key is present.
  */
 
+import { Resend } from "resend";
 import type { WhitepaperPayload } from "@/types/whitepaper";
 import { REASON_LABEL } from "@/types/whitepaper";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 const ENABLE_EMAIL = process.env.ENABLE_EMAIL_SENDING === "true";
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM = process.env.RESEND_FROM ?? "Z-Data <onboarding@resend.dev>";
+const NOTIFY_TO = process.env.WHITEPAPER_NOTIFY_EMAIL;
 
 interface SubmitResult {
   notified: boolean;
@@ -103,21 +107,74 @@ export async function recordWhitepaperSubmission(
     }
   }
 
-  if (!ENABLE_EMAIL) {
-    // Development mode (default). Do NOT call any external email service.
-    return { notified: false, persisted };
+  // === Email notification via Resend (gated by ENABLE_EMAIL_SENDING) ===
+  let notified = false;
+  if (ENABLE_EMAIL && RESEND_API_KEY && NOTIFY_TO) {
+    try {
+      const resend = new Resend(RESEND_API_KEY);
+      const subject = `[Z-Data] 新規リード: ${payload.company} / ${payload.name}`;
+      const lines = [
+        `新しいWhitepaperリードが届きました。`,
+        ``,
+        `■ 会社名: ${payload.company}`,
+        `■ お名前: ${payload.name}`,
+        `■ 役職  : ${payload.position ?? "-"}`,
+        `■ メール: ${payload.email}`,
+        `■ 電話  : ${payload.phone ?? "-"}`,
+        `■ 理由  : ${reasonLabel}`,
+        `■ メッセージ:`,
+        payload.message ?? "(なし)",
+        ``,
+        `送信日時: ${ts()} JST`,
+        `同意   : ${payload.consent ? "あり" : "なし"}`,
+        ``,
+        `Supabase記録: ${persisted ? "保存済み ✓" : "保存失敗 or 未設定"}`,
+      ];
+      const html = `
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;color:#1a1a1a;line-height:1.7;max-width:560px;margin:0 auto;padding:24px;">
+          <h2 style="font-size:18px;font-weight:700;margin:0 0 16px;border-bottom:2px solid #FF8AB4;padding-bottom:8px;">新規Whitepaperリード</h2>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:8px 0;color:#737373;width:90px;">会社名</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(payload.company)}</td></tr>
+            <tr><td style="padding:8px 0;color:#737373;">お名前</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(payload.name)}</td></tr>
+            <tr><td style="padding:8px 0;color:#737373;">役職</td><td style="padding:8px 0;">${escapeHtml(payload.position ?? "-")}</td></tr>
+            <tr><td style="padding:8px 0;color:#737373;">メール</td><td style="padding:8px 0;"><a href="mailto:${escapeHtml(payload.email)}" style="color:#4A7BC7;">${escapeHtml(payload.email)}</a></td></tr>
+            <tr><td style="padding:8px 0;color:#737373;">電話</td><td style="padding:8px 0;">${escapeHtml(payload.phone ?? "-")}</td></tr>
+            <tr><td style="padding:8px 0;color:#737373;">理由</td><td style="padding:8px 0;">${escapeHtml(reasonLabel)}</td></tr>
+          </table>
+          <div style="margin-top:16px;padding:12px;background:#FAFAF7;border-left:3px solid #8FB8E8;font-size:14px;white-space:pre-wrap;">${escapeHtml(payload.message ?? "(メッセージなし)")}</div>
+          <p style="margin-top:24px;font-size:12px;color:#737373;">送信日時: ${ts()} JST · 同意: ${payload.consent ? "あり" : "なし"} · DB保存: ${persisted ? "✓" : "—"}</p>
+        </div>
+      `;
+      const { error } = await resend.emails.send({
+        from: RESEND_FROM,
+        to: NOTIFY_TO,
+        replyTo: payload.email,
+        subject,
+        text: lines.join("\n"),
+        html,
+      });
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error("[whitepaper] Resend send error:", error.message);
+      } else {
+        notified = true;
+        // eslint-disable-next-line no-console
+        console.log("[whitepaper] Email sent via Resend ✓");
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("[whitepaper] Resend send threw:", e);
+    }
   }
 
-  // Production path is intentionally not implemented in this build.
-  // When the user is ready to enable outbound mail, wire Resend here:
-  //
-  //   const resend = new Resend(process.env.RESEND_API_KEY);
-  //   await resend.emails.send({ from, to: process.env.WHITEPAPER_NOTIFY_EMAIL!, ... });
-  //
-  // Until then, treat the flag as a no-op and return notified=false.
-  // eslint-disable-next-line no-console
-  console.warn(
-    "[whitepaper] ENABLE_EMAIL_SENDING=true is set but no transport is wired in this build.",
-  );
-  return { notified: false, persisted };
+  return { notified, persisted };
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
